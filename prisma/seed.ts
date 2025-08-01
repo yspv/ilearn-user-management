@@ -1,4 +1,4 @@
-import { PrismaClient } from "@/generated/prisma";
+import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
 import data from "./MOCK_DATA.json";
 const prisma = new PrismaClient();
