@@ -19,16 +19,10 @@ export const verifySession = cache(async () => {
 export const getUser = cache(async () => {
   const session = await verifySession();
   if (!session) return null;
-  try {
-    const user = await prisma.user.findUniqueOrThrow({
-      where: { id: session.userId },
-    });
-    return user;
-  } catch (err) {
-    console.error(err);
-    console.log("fail when fetching user");
-    return null;
-  }
+  const user = await prisma.user.findUnique({
+    where: { id: session.userId },
+  });
+  return user;
 });
 
 export async function findUserByEmail(email: string) {
