@@ -1,5 +1,4 @@
 "use server";
-import prisma from "@/lib/prisma";
 import bcrypt from "bcrypt";
 import {
   FormState,
@@ -8,71 +7,76 @@ import {
 } from "@/lib/definitions";
 import { createSession, deleteSession } from "@/lib/session";
 import { redirect } from "next/navigation";
+import { User } from "@prisma/client";
+import z from "zod";
+import {
+  checkUserExists,
+  createUser,
+  findUserByEmail,
+  updateLastLogin,
+} from "@/lib/dal";
 
 async function isValidPassword(password: string, passwordHash: string) {
-  return await bcrypt.compare(password, passwordHash);
+  return bcrypt.compare(password, passwordHash);
+}
+
+async function canUserLogin(user: User, password: string) {
+  if (user.isActive && (await isValidPassword(password, user.password))) {
+    return true;
+  }
+  return false;
+}
+
+function validateFormData<T extends z.ZodTypeAny>(schema: T, data: FormData) {
+  const object = Object.fromEntries(data.entries());
+  const fields = schema.safeParse(object);
+  if (!fields.success) {
+    return { success: false, errors: fields.error.flatten().fieldErrors };
+  }
+  return { success: true, data: fields.data };
+}
+
+async function verifyUserCredentials(user: any, password: string) {
+  if (!user || !(await canUserLogin(user, password))) {
+    return {
+      success: false,
+      errors: {
+        email: ["Invalid email or password"],
+      },
+    };
+  }
+  return { success: true };
 }
 
 export async function signin(state: FormState, formData: FormData) {
-  const fields = SigninFormSchema.safeParse({
-    email: formData.get("email"),
-    password: formData.get("password"),
-  });
-
+  const fields = validateFormData(SigninFormSchema, formData);
   if (!fields.success) {
     return {
-      errors: fields.error.flatten().fieldErrors,
+      errors: fields.errors,
     };
   }
-
-  const { email, password } = fields.data;
-
-  const user = await prisma.user.findUnique({
-    where: { email },
-  });
-
-  if (!user || !user.isActive) {
+  const { email, password } = fields.data!;
+  const user = await findUserByEmail(email);
+  const verifyResult = await verifyUserCredentials(user, password);
+  if (!verifyResult.success) {
     return {
-      errors: {
-        email: ["Invalid email or password"],
-      },
+      errors: verifyResult.errors,
     };
   }
-
-  if (!(await isValidPassword(password, user.password))) {
-    return {
-      errors: {
-        email: ["Invalid email or password"],
-      },
-    };
-  }
-
-  await prisma.user.update({
-    where: { id: user.id },
-    data: { lastLoginAt: new Date() },
-  });
-
-  await createSession(user.id);
-  redirect("/");
+  await updateLastLogin(user!.id);
+  await createSession(user!.id);
+  redirect("/dashboard");
 }
 
 export async function signup(state: FormState, formData: FormData) {
-  const fields = SignupFormSchema.safeParse({
-    name: formData.get("name"),
-    email: formData.get("email"),
-    password: formData.get("password"),
-  });
-
+  const fields = validateFormData(SignupFormSchema, formData);
   if (!fields.success) {
     return {
-      errors: fields.error.flatten().fieldErrors,
+      errors: fields.errors,
     };
   }
-
-  const { name, email, password } = fields.data;
-
-  const isUserExists = !!(await prisma.user.findUnique({ where: { email } }));
-
+  const { email } = fields.data!;
+  const isUserExists = await checkUserExists(email);
   if (isUserExists) {
     return {
       errors: {
@@ -80,20 +84,9 @@ export async function signup(state: FormState, formData: FormData) {
       },
     };
   }
-
-  const hashedPassword = await bcrypt.hash(password, 10);
-  const user = await prisma.user.create({
-    data: {
-      name,
-      email,
-      password: hashedPassword,
-      lastLoginAt: new Date(),
-      isActive: true,
-    },
-  });
-
+  const user = await createUser(fields.data!);
   await createSession(user.id);
-  redirect("/");
+  redirect("/dashboard");
 }
 
 export async function logout() {
