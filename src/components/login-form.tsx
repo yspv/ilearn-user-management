@@ -17,7 +17,7 @@ export function LoginForm() {
         </p>
       </div>
       <div className="grid gap-6">
-        {state?.errors.email && (
+        {state?.errors?.email && (
           <p className="bg-red-200 text-red-900 rounded px-3 py-1">
             {state.errors.email}
           </p>
@@ -41,7 +41,7 @@ export function LoginForm() {
         </Button>
       </div>
       <div className="text-center text-sm">
-        Don&apos;t have an account?
+        Don&apos;t have an account?&nbsp;
         <a href="/register" className="underline underline-offset-4">
           Sign up
         </a>

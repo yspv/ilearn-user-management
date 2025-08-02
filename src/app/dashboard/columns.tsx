@@ -1,5 +1,5 @@
+import { DataTableHeader } from "@/components/data-table-header";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Tooltip,
@@ -7,13 +7,9 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { Column, ColumnDef } from "@tanstack/react-table";
-import {
-  ChevronDownIcon,
-  ChevronsUpDownIcon,
-  ChevronUpIcon,
-  Circle,
-} from "lucide-react";
+import { ColumnDef } from "@tanstack/react-table";
+import { Circle, ClockIcon, MailIcon, User2Icon } from "lucide-react";
+import React from "react";
 
 function timeAgo(date: Date) {
   const rtf = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
@@ -39,23 +35,6 @@ function timeAgo(date: Date) {
 
   return "just now";
 }
-
-const DataTableHeader = (props: { column: Column<any>; title: string }) => {
-  const { title, column } = props;
-  return (
-    <Button
-      size={"sm"}
-      variant={"ghost"}
-      className="justify-start"
-      onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-    >
-      <span>{title} </span>
-      {!column.getIsSorted() && <ChevronsUpDownIcon />}
-      {column.getIsSorted() === "asc" && <ChevronUpIcon />}
-      {column.getIsSorted() === "desc" && <ChevronDownIcon />}
-    </Button>
-  );
-};
 
 export const columns: ColumnDef<any>[] = [
   {
@@ -86,15 +65,18 @@ export const columns: ColumnDef<any>[] = [
   },
   {
     accessorKey: "name",
-    header: ({ column }) => DataTableHeader({ column, title: "Name" }),
+    header: ({ column }) =>
+      DataTableHeader({ column, title: "Name", icon: <User2Icon /> }),
   },
   {
     accessorKey: "email",
-    header: ({ column }) => DataTableHeader({ column, title: "Email" }),
+    header: ({ column }) =>
+      DataTableHeader({ column, title: "Email", icon: <MailIcon /> }),
   },
   {
     accessorKey: "isActive",
-    header: ({ column }) => DataTableHeader({ column, title: "Status" }),
+    header: ({ column }) =>
+      DataTableHeader({ column, title: "Status", icon: <Circle /> }),
     cell: ({ row }) => (
       <Badge variant="outline">
         <Circle
@@ -109,7 +91,8 @@ export const columns: ColumnDef<any>[] = [
   },
   {
     accessorKey: "lastLoginAt",
-    header: ({ column }) => DataTableHeader({ column, title: "Last Login" }),
+    header: ({ column }) =>
+      DataTableHeader({ column, title: "Last Login", icon: <ClockIcon /> }),
     cell: ({ row }) => (
       <Tooltip>
         <TooltipTrigger>

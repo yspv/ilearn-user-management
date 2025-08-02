@@ -21,7 +21,7 @@ interface DataTablePaginationProps {
 export function DataTableSelectedRows(props: DataTablePaginationProps) {
   const { table } = props;
   return (
-    <div className="text-muted-foreground hidden flex-1 text-sm lg:flex">
+    <div className="text-muted-foreground flex-1 text-sm flex">
       {table.getFilteredSelectedRowModel().rows.length} of{" "}
       {table.getFilteredRowModel().rows.length} row(s) selected.
     </div>

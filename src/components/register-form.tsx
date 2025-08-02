@@ -21,7 +21,7 @@ export function RegisterForm() {
           <Label htmlFor="name">Name</Label>
           <Input id="name" name="name" type="name" required />
         </div>
-        {state?.errors.name && <p>{state.errors.name}</p>}
+        {state?.errors?.name && <p>{state.errors.name}</p>}
         <div className="grid gap-3">
           <Label htmlFor="email">Email</Label>
           <Input
@@ -32,18 +32,18 @@ export function RegisterForm() {
             required
           />
         </div>
-        {state?.errors.email && <p>{state.errors.email}</p>}
+        {state?.errors?.email && <p>{state.errors.email}</p>}
         <div className="grid gap-3">
           <Label htmlFor="password">Password</Label>
           <Input id="password" name="password" type="password" required />
         </div>
-        {state?.errors.password && <p>{state.errors.password}</p>}
+        {state?.errors?.password && <p>{state.errors.password}</p>}
         <Button type="submit" disabled={pending} className="w-full">
           Sigup
         </Button>
       </div>
       <div className="text-center text-sm">
-        Already have an account?
+        Already have an account?&nbsp;
         <a href="/login" className="underline underline-offset-4">
           Sign in
         </a>
