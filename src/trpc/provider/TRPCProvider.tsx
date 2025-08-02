@@ -11,7 +11,7 @@ const TRPCProvider = ({ children }: PropsWithChildren) => {
     trpc.createClient({
       links: [
         httpBatchLink({
-          url: `${process.env.NEXT_PUBLIC_SERVER_URL}/api/trpc`,
+          url: `/api/trpc`,
           fetch(url, options) {
             return fetch(url, {
               ...options,

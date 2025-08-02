@@ -1,13 +1,18 @@
 import z from "zod";
 import { privateProcedure, router } from "../../trpc";
 import prisma from "@/lib/prisma";
-import { UserDTO } from "@/lib/dto";
+import { UserDTO, userToDTO } from "@/lib/dto";
 
 export const userRouter = router({
-  me: privateProcedure.query<UserDTO | null | undefined>(({ ctx }) => ctx.user),
-  findAll: privateProcedure.query<UserDTO[]>(async () =>
-    prisma.user.findMany({ orderBy: { lastLoginAt: "desc" } })
+  me: privateProcedure.query<UserDTO | null | undefined>(({ ctx }) =>
+    userToDTO(ctx.user)
   ),
+  findAll: privateProcedure.query(async () => {
+    const users = await prisma.user.findMany({
+      orderBy: { lastLoginAt: "desc" },
+    });
+    return users.map(userToDTO);
+  }),
   block: privateProcedure.input(z.number().array()).mutation(async (opts) => {
     const { input } = opts;
     await prisma.user.updateMany({

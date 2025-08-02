@@ -14,7 +14,6 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider(props: { children: React.ReactNode }) {
   const { children } = props;
   const { data: user, isLoading, error } = trpc.user.me.useQuery();
-  React.useEffect(() => console.log(user), [user]);
   React.useEffect(() => {
     if (error?.shape?.code === TRPC_ERROR_CODES_BY_KEY.UNAUTHORIZED) {
       logout();
