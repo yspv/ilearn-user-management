@@ -43,8 +43,8 @@ export function RegisterForm() {
         </Button>
       </div>
       <div className="text-center text-sm">
-        Already have an account?{" "}
-        <a href="#" className="underline underline-offset-4">
+        Already have an account?
+        <a href="/login" className="underline underline-offset-4">
           Sign in
         </a>
       </div>
